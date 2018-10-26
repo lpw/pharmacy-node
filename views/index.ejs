@@ -1,0 +1,244 @@
+<html>
+   <head>
+      <title>Pharamcy</title>
+      <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/css/materialize.min.css">
+      <style type="text/css">
+          .form_row{margin-top: 30px;}
+          .loading{border:none !important;}
+          .loading th{padding:0px;}
+          .loading div{margin-top: 0px;}
+          select {
+              display: block;
+          }
+          .container {width: 90%;}
+          .main-header {
+              position: relative;
+              max-height: 100px;
+              z-index: 1030;
+          }
+          .navbar {
+              background-color: #00a65a;
+              height: 50px;
+          }
+      </style>
+   </head>
+   <body>
+    <header class="main-header"> 
+        <nav class="navbar navbar-static-top" role="navigation">      
+            
+        </nav>
+    </header>
+     <div class="container">
+      <div class="section">
+       <center><h4 style="margin-top:5px;"> Pharamcy</h4></center>
+       <div class="row form_row">
+              <div class="col s4" style="background:#f8f8f8;padding:25px;">
+                  <p>Add Record </p><br/>
+                  <form method="post" id="add_data" >
+                    <div class="input-field">
+                      <input id="med_name" type="text" class="validate">
+                      <label for="med_name">Name</label>
+                    </div>
+                    <div class="input-field">
+                      <input id="med_price" type="text" class="validate">
+                      <label for="med_price">Price</label>
+                    </div>
+                    <div class="select-field" style="border-bottom: 1px solid #9e9e9e;">
+                      <label for="med_type">Type</label>
+                      <select id="med_type" class="validate">
+                        <option value="capsule">Capsule</option>
+                        <option value="tablet">Tablet</option>
+                        <option value="syrup">Syrup</option>
+                        <option value="gel">Gel</option>
+                      </select>
+                      
+                    </div>
+                    <div class="input-field">
+                      <input id="manufacturer" type="text" class="validate">
+                      <label for="manufacturer">Manufacturer</label>
+                    </div>
+                    <div class="input-field">
+                      <input id="batch_no" type="text" class="validate">
+                      <label for="batch_no">Batch Number</label>
+                    </div>
+                    <div class="input-field">
+                      <input id="expiration_date" type="text" class="validate">
+                      <label for="expiration_date">Expire date</label>
+                    </div>
+                    <input type="submit" name="submit" value="Submit" class="btn-large" />
+                  </form>
+              </div>
+              <div class="col s8">
+                <table class="responsive-table" id="records_tbl">
+                  <thead>
+                    <tr>
+                        <th>Name</th>
+                        <th>Price</th>
+                        <th>Type</th>
+                        <th>Manufacturer</th>
+                        <th>Batch No</th>
+                        <th>Action</th>
+                    </tr>
+                    <tr class="loading" id="loading">
+                          <th colspan="6">
+                              <div class="progress"><div class="indeterminate"></div></div>
+                          </th>
+                    </tr>
+                  </thead>
+
+                  <tbody>
+                  </tbody>
+                </table>
+              </div>
+       </div>
+     </div>
+   </div>
+   <!-- Edit Modal -->
+   <div id="modal1" class="modal">
+     <div class="modal-content">
+       <h4>Edit Record</h4>
+       <form method="post" id="edit_data" >
+         <div class="input-field">
+           <input id="edit_med_name" type="text" class="validate">
+           <label for="edit_med_name" id="edit_name_label" class="active">Name</label>
+         </div>
+         <div class="input-field">
+           <input id="edit_med_price" type="text" class="validate">
+           <label for="edit_med_price" id="edit_price_label" class="active">Price</label>
+         </div>
+         <div class="input-field" style="border-bottom: 1px solid #9e9e9e;">
+           <select id="edit_med_type" class="validate">
+              <option value="capsule">Capsule</option>
+              <option value="tablet">Tablet</option>
+              <option value="syrup">Syrup</option>
+              <option value="gel">Gel</option>
+            </select>
+           <label for="edit_med_type" id="edit_type_label" class="active">Type</label>
+         </div>
+         <div class="input-field">
+           <input id="edit_manufacturer" type="text" class="validate">
+           <label for="edit_manufacturer" id="edit_manuf_label" class="active">Manufacturer</label>
+         </div>
+         <div class="input-field">
+           <input id="edit_batch_no" type="text" class="validate">
+           <label for="edit_batch_no" id="edit_batch_label" class="active">Batch Number</label>
+         </div>
+         <div class="input-field">
+           <input id="edit_expiration_date" type="text" class="validate">
+           <label for="edit_expiration_date" id="edit_expiration_label" class="active">Expire date</label>
+         </div>
+         <input id="unique_id" type="hidden" class="">
+         <input type="submit" name="submit" value="Submit" class="btn" /> <a href="javascript:closeme()" class="btn btn-primary">Close</a>
+       </form>
+     </div>
+   </div>
+   <div class="modal-overlay" id="modal-overlay" style="z-index: 1002; display: none; opacity: 0.5;"></div>
+   
+   <script src="https://cdnjs.cloudflare.com/ajax/libs/materialize/1.0.0-beta/js/materialize.min.js"></script>
+   <script type="text/javascript">
+      const form = document.getElementById('add_data');
+      form.addEventListener('submit',function(e){
+          const data = { 'name' : document.getElementById('med_name').value , 'price' :  document.getElementById('med_price').value, 'manufacturer' : document.getElementById('manufacturer').value , 'type' :  document.getElementById('med_type').value, 'batch_no' : document.getElementById('batch_no').value , 'expiration_date' :  document.getElementById('expiration_date').value  };
+          fetch('/users/create',{
+              method : 'post',
+              body : JSON.stringify(data),
+              headers : new Headers({
+                'content-type' : 'application/json'
+              })
+          }).then( res => res.json() )
+            .catch(err => console.log(err));
+
+          M.toast({html: 'Record Inserted successfully!', classes: 'rounded'});
+          form.reset();
+          e.preventDefault();
+          location.reload();
+      });
+
+      const eform = document.getElementById('edit_data');
+      eform.addEventListener('submit',function(e){
+           const data = { 'id': document.getElementById('unique_id').value, 'name' : document.getElementById('edit_med_name').value , 'price' :  document.getElementById('edit_med_price').value, 'manufacturer' : document.getElementById('edit_manufacturer').value , 'type' :  document.getElementById('edit_med_type').value, 'batch_no' : document.getElementById('edit_batch_no').value , 'expiration_date' :  document.getElementById('edit_expiration_date').value  };
+          fetch('/users/update/'+data.id,{
+              method : 'put',
+              body : JSON.stringify(data),
+              headers : new Headers({
+                'content-type' : 'application/json'
+              })
+          }).then( res => res.json() )
+            .catch(err => console.log(err));
+          closeme();
+          M.toast({html: 'Record updated successfully!', classes: 'rounded'});
+          form.reset();
+          e.preventDefault();
+          location.reload();
+      });
+
+      fetch('/users')
+        .then( res => res.json() )
+        .then( data => {
+               document.getElementById("loading").style.display = "none";
+               var results = data.results.medicines;
+               var count = results.length;
+               var table = document.getElementById("records_tbl").getElementsByTagName('tbody')[0];
+               var count = 0;
+               results.forEach((result) => {
+                    var row = table.insertRow(count);
+                    row.id = result.id;
+                    var cell1 = row.insertCell(0);
+                    var cell2 = row.insertCell(1);
+                    var cell3 = row.insertCell(2);
+                    var cell4 = row.insertCell(3);
+                    var cell5 = row.insertCell(4);
+                    var cell6 = row.insertCell(5);
+                    // Add some text to the new cells:
+                    cell1.innerHTML = result.name;
+                    cell2.innerHTML = result.price;
+                    cell3.innerHTML = result.type;
+                    cell4.innerHTML = result.manufacturer;
+                    cell5.innerHTML = result.batch_no;
+                    cell6.innerHTML = "<a href='javascript:editmodal(\""+ result.name +"\",\""+ result.price +"\",\""+ result.manufacturer +"\",\""+ result.type +"\",\""+ result.expiration_date +"\",\""+ result.batch_no + "\",\""+ result.id + "\")' class='btn edit_btn'>Edit</a> <a href='javascript:deleteme(\""+ result.id +"\")' class='btn'>Delete</a>";
+                    count++;
+                });
+        })
+        .catch(err => console.log(err));
+
+        function editmodal(name, price, manufacturer, type, exdate, bno, unique_id){
+              document.getElementById('edit_med_name').value = name;
+              document.getElementById('edit_med_price').value = price;
+              document.getElementById('edit_manufacturer').value = manufacturer;
+              document.getElementById('edit_med_type').value = type;
+              document.getElementById('edit_batch_no').value = bno;
+              document.getElementById('edit_expiration_date').value = exdate;
+              document.getElementById('unique_id').value = unique_id;
+              document.getElementById('edit_name_label').classList.add("active");
+              document.getElementById('edit_price_label').classList.add("active");
+              document.getElementById('edit_type_label').classList.add("active");
+              document.getElementById('edit_manuf_label').classList.add("active");
+              document.getElementById('edit_batch_label').classList.add("active");
+              document.getElementById('edit_expiration_label').classList.add("active");
+              document.getElementById('modal-overlay').style.display='block';
+              document.getElementById('modal1').style.display='block';
+              document.getElementById('modal1').style.zIndex ='1003';
+              document.getElementById('modal1').style.opacity='1';
+              document.getElementById('modal1').style.top='10%';
+              document.getElementById('modal1').style.transform='scaleX(1) scaleY(1)';
+        }
+        function closeme(){
+          document.getElementById('modal-overlay').style.display='none';
+          document.getElementById('modal1').style.display='none';
+        }
+        function deleteme(id){
+          const data = { 'id' : id};
+          fetch('/users/delete/'+id,{
+              method : 'DELETE',
+              body : JSON.stringify(data),
+              headers : new Headers({
+                'content-type' : 'application/json'
+              })
+          }).then( res => res.json() )
+            .catch(err => console.log(err));
+          M.toast({html: 'Record deleted successfully!', classes: 'rounded'});
+          document.getElementById(id).style.display = "none";
+        }
+   </script>
+   </body>
+</html>
