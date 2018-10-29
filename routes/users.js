@@ -17,8 +17,7 @@ router.post('/create',function(req,res){
         medData.medicines.push(medicin);
 
     let data = JSON.stringify(medData, null, 2);    
-    fs.writeFileSync('medicine.json', data);  
-    //console.log(data);
+    fs.writeFileSync('medicine.json', data); 
     return res.json({success:true, message:'Record added successfully.'})
 });
 
