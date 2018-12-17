@@ -6,7 +6,7 @@
       "price": "5",
       "manufacturer": "apllo",
       "type": "tablet",
-      "expiration_date": "13-12-2018",
+      "expiration_date": "22-10-2018",
       "batch_no": "1"
     },
     {
@@ -15,7 +15,7 @@
       "price": "5",
       "manufacturer": "apllo",
       "type": "syrup",
-      "expiration_date": "",
+      "expiration_date": "13-12-2018",
       "batch_no": "2"
     }
   ]
