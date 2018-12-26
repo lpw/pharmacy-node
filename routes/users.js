@@ -22,10 +22,30 @@ let deletedata = function(data, id) {
 }
 
 router.get('/',function(req,res){
+   
+    return res.json({success:true, results: medData}) ;
+});
+
+router.get('/arrflat',function(req,res){
     var arry =  [1, 2, [3, 4]];
     let reducer = (accumulator, currentValue) => accumulator + currentValue;
     let aa= arry.reduce((acc, val) => acc.concat(val), []);
     return res.json({success:true, results: aa}) ;
+});
+
+router.get('/datefilter', function(req,res, next){
+    try{
+    let fromdat = req.query.from; //new Date(parseInt(req.query.from));
+    let todat = req.query.to; //new Date(parseInt(req.query.to));
+    console.log(fromdat, todat);
+    let user = medData.medicines.filter((item) => {
+       return (item.expiredate >= fromdat && item.expiredate <= todat)
+    });
+
+    return res.json(user);
+   } catch(err){
+    return next(error);
+   }
 });
 
 router.post('/create',function(req,res){
@@ -56,14 +76,19 @@ router.delete('/delete/:id',function(req,res, next){
     //let medobj = medData.medicines.find(x => x.id == req.params.id);
     //const index = medData.medicines.indexOf(medobj);
     try {
-        const index = medData.medicines.findIndex(x => x.id == req.body.id);
+        const index = medData.medicines.findIndex(x => x.id == req.params.id);
+        console.log("index", index);
+        if(index != -1){
         medData.medicines.splice(index, 1);
         let data = JSON.stringify(medData, null, 2);  
-        console.log("index", index);
+        
         console.log(medData);  
         //fs.writeFileSync('medicine.json', data);
         writeDat(data);
         return res.json({success:true, message:'Record deleted successfully.'})
+       } else{
+         return res.json({message: 'Record not found'});
+       }
     } catch (error)
     {
         return next(error);

@@ -1,4 +1,3 @@
-'use strict';
 
 const chai = require('chai');
 const expect = require('chai').expect;
@@ -26,8 +25,8 @@ describe('API endpoint /users', function() {
 
         expect(res).to.have.status(200);
         expect(res).to.be.json;
-        expect(res.body.results).to.be.an('array');
-        expect(res.body.results).to.have.lengthOf(4);
+        //expect(res.body.results).to.be.an('array');
+        expect(res.body.results.medicines).to.have.lengthOf(2);
       });
   });
 
